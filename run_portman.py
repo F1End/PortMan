@@ -6,3 +6,4 @@ if __name__ == "__main__":
     menu = menu.MainMenu(option_hierarchy=menu.default_option_hierarchy, starting_point="main")
     menu.run_menu()
     # db_manager.close_connection()
+

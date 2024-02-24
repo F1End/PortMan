@@ -1,0 +1,8 @@
+default_tables:
+  - sec_details
+  - fx_rates
+  - prices
+  - trades
+  - positions
+  - agg_data
+  - portfolios

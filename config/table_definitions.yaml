@@ -1,0 +1,55 @@
+sec_details:
+  - isin: TEXT PRIMARY KEY
+  - short_name: TEXT
+  - full_name: TEXT
+  - type: TEXT
+  - Subtype: TEXT
+  - Currency: TEXT
+
+fx_rates:
+  - date: TEXT
+  - currency_1: TEXT
+  - currency_2: TEXT
+  - rate: REAL
+
+prices:
+  - date: TEXT
+  - isin: TEXT
+  - price: REAL
+  - source: TEXT
+
+trades:
+  - date: TEXT
+  - isin: TEXT
+  - transaction_type: TEXT
+  - quantity: INTEGER
+  - average_price: REAL
+
+positions:
+  - port_id: INTEGER
+  - isin: TEXT
+  - quantity: INTEGER
+  - start_date: TEXT
+  - end_date: TEXT
+
+portfolios:
+  - port_id: INTEGER
+  - port_name: TEXT
+  - broker: TEXT
+  - type: TEXT
+  - remark: TEXT
+
+agg_data:
+  - date: TEXT
+  - port_name: TEXT
+  - isin: TEXT
+  - type: TEXT
+  - subtype: TEXT
+  - quantity: INTEGER
+  - price: REAL
+  - local_currency: TEXT
+  - mkt_val_local: REAL
+  - global_curr_1: TEXT
+  - mkt_val_global_1: REAL
+  - global_curr_2: TEXT
+  - mkt_val_global_2: REAL

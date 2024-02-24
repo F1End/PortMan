@@ -1,67 +1,78 @@
 import os
 import sqlite3
+from typing import Optional, Dict
+from os import path
+import yaml
 
 
 class DatabaseManager:
-    def __init__(self, db_path=None, db_name=None, init=True):
+    def __init__(self, db_path: Optional[str] = None, db_name: Optional[str] = None, init: Optional[bool] = True) -> None:
         """
-
         :param db_path: Where database file is to be located (defaults to script directory)
         :param db_name: Database name (defaults to "portman.db")
         :param init: If true, DatabaseManager will check the existence of the db file and tables, and if missing
         creates them when the instance is initiated
         """
         default_db = "portman.db"
+        db_config_location = {"table_collections": path.join("config", "table_collections.yaml"),
+                              "table_definitions": path.join("config", "table_definitions.yaml")}
         self.db_name = default_db if not db_name else str(db_name)
-        self.db_path = self.db_name if not db_path else str(db_path) + str(self.db_name)  # ->imp: os independent
+        self.db_path = self.db_name if not db_path else path.join(db_path, self.db_name)
         self.conn = sqlite3.connect(self.db_path)
         self.cursor = self.conn.cursor()
-        self.default_tables = ["sec_details", "fx_rates", "prices", "trades", "positions", "agg_data", "portfolios"]
-        self.table_definitions = {"sec_details": "isin TEXT PRIMARY KEY, "
-                                                 "short_name TEXT, "
-                                                 "full_name TEXT, "
-                                                 "type TEXT, "
-                                                 "Subtype TEXT, "
-                                                 "Currency TEXT",
-                                  "fx_rates": "date TEXT, "
-                                              "currency_1 TEXT, "
-                                              "currency_2 TEXT, "
-                                              "rate REAL",
-                                  "prices": "date TEXT, "
-                                            "isin TEXT, "
-                                            "price REAL,"
-                                            "source TEXT",
-                                  "trades": "date TEXT, "
-                                            "isin TEXT, "
-                                            "transaction_type TEXT, "
-                                            "quantity INTEGER, "
-                                            "average_price REAL",
-                                  "positions": "port_id INTEGER, "
-                                               "isin TEXT, "
-                                               "quantity INTEGER, "
-                                               "start_date TEXT"
-                                               "end_date TEXT",
-                                  "portfolios": "port_id INTEGER, "
-                                                "port_name TEXT, "
-                                                "broker TEXT, "
-                                                "type TEXT"
-                                                "remark TEXT",
-                                  "agg_data": "date TEXT, "
-                                              "port_name TEXT, "
-                                              "isin TEXT, "
-                                              "type TEXT, "
-                                              "subtype TEXT, "
-                                              "quantity INTEGER, "
-                                              "price REAL, "
-                                              "local_currency TEXT,"
-                                              "mkt_val_local REAL, "
-                                              "global_curr_1 TEXT, "
-                                              "mkt_val_global_1 REAL, "
-                                              "global_curr_2 TEXT, "
-                                              "mkt_val_global_2 REAL"}
+        # self.default_tables = ["sec_details", "fx_rates", "prices", "trades", "positions", "agg_data", "portfolios"]
+        self.default_tables = self.load_yaml(db_config_location["table_collections"])
+        self.table_definitions = self.load_yaml(db_config_location["table_definitions"])
+        # self.table_definitions2 = {"sec_details": "isin TEXT PRIMARY KEY, "
+        #                                          "short_name TEXT, "
+        #                                          "full_name TEXT, "
+        #                                          "type TEXT, "
+        #                                          "Subtype TEXT, "
+        #                                          "Currency TEXT",
+        #                           "fx_rates": "date TEXT, "
+        #                                       "currency_1 TEXT, "
+        #                                       "currency_2 TEXT, "
+        #                                       "rate REAL",
+        #                           "prices": "date TEXT, "
+        #                                     "isin TEXT, "
+        #                                     "price REAL,"
+        #                                     "source TEXT",
+        #                           "trades": "date TEXT, "
+        #                                     "isin TEXT, "
+        #                                     "transaction_type TEXT, "
+        #                                     "quantity INTEGER, "
+        #                                     "average_price REAL",
+        #                           "positions": "port_id INTEGER, "
+        #                                        "isin TEXT, "
+        #                                        "quantity INTEGER, "
+        #                                        "start_date TEXT"
+        #                                        "end_date TEXT",
+        #                           "portfolios": "port_id INTEGER, "
+        #                                         "port_name TEXT, "
+        #                                         "broker TEXT, "
+        #                                         "type TEXT"
+        #                                         "remark TEXT",
+        #                           "agg_data": "date TEXT, "
+        #                                       "port_name TEXT, "
+        #                                       "isin TEXT, "
+        #                                       "type TEXT, "
+        #                                       "subtype TEXT, "
+        #                                       "quantity INTEGER, "
+        #                                       "price REAL, "
+        #                                       "local_currency TEXT,"
+        #                                       "mkt_val_local REAL, "
+        #                                       "global_curr_1 TEXT, "
+        #                                       "mkt_val_global_1 REAL, "
+        #                                       "global_curr_2 TEXT, "
+        #                                       "mkt_val_global_2 REAL"}
 
         if init:
             self.default_init()
+
+    def load_yaml(self, file_path: str) -> Dict:
+        with open(file_path, "r") as f:
+            data = yaml.safe_load(f)
+        return data
 
     def default_init(self):
         print("Checking databfile availability...")
